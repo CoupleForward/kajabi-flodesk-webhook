@@ -27,13 +27,7 @@ export default async function handler(req, res) {
 
     const authHeader = 'Basic ' + Buffer.from(FLODESK_API_KEY + ':').toString('base64');
 
-    let segmentId = null;
-    try {
-      segmentId = await getOrCreateSegment(SEGMENT_NAME, authHeader);
-      console.log('Segment resolved: ' + SEGMENT_NAME + ' -> ' + segmentId);
-    } catch (segErr) {
-      console.error('Segment error (non-fatal):', segErr.message);
-    }
+    const segmentId = process.env.FLODESK_SEGMENT_ID || null;
 
     await upsertAndSegment(primaryEmail, firstName, lastName, segmentId, authHeader);
     console.log('Primary subscriber added: ' + primaryEmail);
