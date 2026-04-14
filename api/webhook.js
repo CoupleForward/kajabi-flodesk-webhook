@@ -87,7 +87,7 @@ async function upsertAndSegment(email, firstName, lastName, segmentId, authHeade
       'Authorization': authHeader,
       'User-Agent': 'CoupleForward/1.0 (coupleforward.com)'
     },
-    body: JSON.stringify({
+    body: JSON.stringify({ name: name, color: '#5ec6ca' })
       email: email,
       first_name: firstName,
       last_name: lastName,
