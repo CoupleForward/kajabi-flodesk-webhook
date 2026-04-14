@@ -26,7 +26,15 @@ export default async function handler(req, res) {
     }
 
     const authHeader = 'Basic ' + Buffer.from(FLODESK_API_KEY + ':').toString('base64');
-    const segmentId = await getOrCreateSegment(SEGMENT_NAME, authHeader);
+
+    let segmentId = null;
+    try {
+      segmentId = await getOrCreateSegment(SEGMENT_NAME, authHeader);
+      console.log('Segment resolved: ' + SEGMENT_NAME + ' -> ' + segmentId);
+    } catch (segErr) {
+      console.error('Segment error (non-fatal):', segErr.message);
+    }
+
     await upsertAndSegment(primaryEmail, firstName, lastName, segmentId, authHeader);
     console.log('Primary subscriber added: ' + primaryEmail);
 
@@ -104,26 +112,22 @@ async function getOrCreateSegment(name, authHeader) {
   });
   if (listRes.ok) {
     const segments = await listRes.json();
-    const existing = (segments.data || segments).find(
-      s => s.name.toLowerCase() === name.toLowerCase()
-    );
-    if (existing) return existing.id;
+    console.log('Segments response type:', typeof segments, Array.isArray(segments));
+    const segArray = segments.data || segments;
+    if (Array.isArray(segArray)) {
+      const existing = segArray.find(
+        s => s.name && s.name.toLowerCase() === name.toLowerCase()
+      );
+      if (existing) {
+        console.log('Found segment: ' + existing.name + ' -> ' + existing.id);
+        return existing.id;
+      }
+      console.log('Segment not found. Available:', segArray.map(s => s.name).join(', '));
+    }
+  } else {
+    console.error('Segment list failed: ' + listRes.status);
   }
-  const createRes = await fetch('https://api.flodesk.com/v1/segments', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': authHeader,
-      'User-Agent': 'CoupleForward/1.0 (coupleforward.com)'
-    },
-    body: JSON.stringify({ name: name, color: '#5ec6ca' })
-  });
-  if (!createRes.ok) {
-    const errBody = await createRes.text();
-    throw new Error('Failed to create segment: ' + errBody);
-  }
-  const newSegment = await createRes.json();
-  return newSegment.id;
+  return null;
 }
 
 function extractField(payload, fieldName) {
