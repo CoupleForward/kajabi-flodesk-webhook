@@ -1,0 +1,7 @@
+{
+  "name": "kajabi-flodesk-webhook",
+  "version": "1.0.0",
+  "description": "Kajabi checkout webhook → Flodesk segment automation for Couple Forward",
+  "private": true,
+  "type": "module"
+}
