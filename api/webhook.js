@@ -32,10 +32,12 @@ export default async function handler(req, res) {
     await upsertAndSegment(primaryEmail, firstName, lastName, segmentId, authHeader);
     console.log('Primary subscriber added: ' + primaryEmail);
 
-    const partnerEmail = extractField(payload, 'partner_email') ||
+    const partnerEmail = payload.custom_partner_email ||
+                         extractField(payload, 'partner_email') ||
                          extractField(payload, 'partner email') ||
                          extractField(payload, 'Partner email');
-    const partnerName = extractField(payload, 'partner_full_name') ||
+    const partnerName = payload.custom_partner_full_name ||
+                        extractField(payload, 'partner_full_name') ||
                         extractField(payload, 'partner full name') ||
                         extractField(payload, 'Partner full name') ||
                         extractField(payload, 'partner_name');
