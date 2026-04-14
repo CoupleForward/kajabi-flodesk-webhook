@@ -24,7 +24,7 @@ export default async function handler(req, res) {
     // Kajabi sends: contact.email, contact.first_name, contact.last_name, contact.name
     // Custom fields come through as additional_fields or custom checkout fields
     const contact = payload.contact || {};
-    const primaryEmail = contact.email;
+    const primaryEmail = contact.email || payload.email;
     const firstName = contact.first_name || '';
     const lastName = contact.last_name || '';
 
